@@ -1,5 +1,8 @@
 name: Playwright Tests
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [ main, master, develop ]
@@ -89,8 +92,17 @@ jobs:
           path: all-blob-reports
           pattern: blob-report-*
 
+      - name: Prepare downloaded blob reports
+        run: |
+          mkdir -p merged-blob-reports
+          for dir in all-blob-reports/*; do
+            if [ -d "$dir/blob-report" ]; then
+              cp -r "$dir/blob-report/"* merged-blob-reports/
+            fi
+          done
+
       - name: Merge reports
-        run: sh ./node_modules/.bin/playwright merge-reports --reporter html ./all-blob-reports
+        run: sh ./node_modules/.bin/playwright merge-reports --reporter html merged-blob-reports
 
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
