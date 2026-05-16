@@ -113,9 +113,21 @@ jobs:
           ls -la merged-blob-reports
 
       - name: Merge reports
-        run: sh ./node_modules/.bin/playwright merge-reports --reporter html merged-blob-reports
+        id: merge_reports
+        run: |
+          sh ./node_modules/.bin/playwright merge-reports --reporter html merged-blob-reports || true
+
+      - name: Check generated HTML report
+        id: check_report
+        run: |
+          if [ -d "playwright-report" ] && [ "$(ls -A playwright-report)" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Publish HTML report to GitHub Pages
+        if: steps.check_report.outputs.exists == 'true'
         uses: peaceiris/actions-gh-pages@v5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -126,8 +138,15 @@ jobs:
           keep_files: false
 
       - name: Upload HTML report
+        if: steps.check_report.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: html-report-merged
           path: playwright-report
           retention-days: 14
+
+      - name: Verify gh-pages branch exists
+        if: steps.check_report.outputs.exists == 'true'
+        run: |
+          echo "Remote gh-pages branch info:" 
+          git ls-remote --heads origin gh-pages || echo "gh-pages branch not found"
