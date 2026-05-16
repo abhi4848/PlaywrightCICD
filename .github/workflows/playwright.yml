@@ -96,10 +96,12 @@ jobs:
         run: |
           mkdir -p merged-blob-reports
           for dir in all-blob-reports/*; do
-            if [ -d "$dir/blob-report" ]; then
-              cp -r "$dir/blob-report/"* merged-blob-reports/
+            if [ -d "$dir" ]; then
+              cp -r "$dir/"* merged-blob-reports/ || true
             fi
           done
+          echo "Merged blob report file list:"
+          ls -la merged-blob-reports
 
       - name: Merge reports
         run: sh ./node_modules/.bin/playwright merge-reports --reporter html merged-blob-reports
