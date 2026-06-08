@@ -104,14 +104,11 @@ environment {
                                  onlyIfSuccessful: false
                 
                 // Publish HTML Report
-                publishHTML([
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report',
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true
-                ])
+               archiveArtifacts artifacts: 'playwright-report/**',
+                 allowEmptyArchive: true
+
+archiveArtifacts artifacts: 'blob-report/**',
+                 allowEmptyArchive: true
                 
                 // JUnit XML Report (if exists)
                 junit testResults: '**/test-results/*.xml',
