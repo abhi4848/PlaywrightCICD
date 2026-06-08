@@ -15,11 +15,13 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
     
-    environment {
-        NODE_HOME = "${tool 'NodeJS-${params.NODE_VERSION}'}"
-        PATH = "${NODE_HOME}\\bin;${PATH}"
-        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 'false'
-    }
+    tools {
+    nodejs 'NodeJS'
+}
+
+environment {
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 'false'
+}
     
     stages {
         stage('Checkout') {
